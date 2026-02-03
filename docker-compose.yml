@@ -1,0 +1,24 @@
+services:
+  connector-misp-feed-rosti:
+    build: .
+    container_name: connector-misp-feed-rosti
+    restart: unless-stopped
+    environment:
+      - OPENCTI_URL=${OPENCTI_URL}
+      - OPENCTI_TOKEN=${OPENCTI_TOKEN}
+      - CONNECTOR_ID=${CONNECTOR_ID}
+      - CONNECTOR_NAME=Rosti MISP Feed
+      - CONNECTOR_SCOPE=misp-feed
+      - CONNECTOR_LOG_LEVEL=info
+      - CONNECTOR_DURATION_PERIOD=PT1H
+      - MISP_FEED_URL=https://misp.rosti.bin.re
+      - MISP_FEED_SOURCE_TYPE=url
+      - MISP_FEED_IMPORT_FROM_DATE=2026-01-01
+      - MISP_FEED_CREATE_REPORTS=true
+      - MISP_FEED_CREATE_INDICATORS=true
+      - MISP_FEED_CREATE_OBSERVABLES=true
+      - MISP_FEED_REPORT_TYPE=misp-event
+      - MISP_FEED_CREATE_OBJECT_OBSERVABLES=true
+      - MISP_FEED_IMPORT_UNSUPPORTED_OBSERVABLES_AS_TEXT=false
+      - MISP_FEED_IMPORT_UNSUPPORTED_OBSERVABLES_AS_TEXT_TRANSPARENT=true
+      - MISP_FEED_IMPORT_WITH_ATTACHMENTS=true
