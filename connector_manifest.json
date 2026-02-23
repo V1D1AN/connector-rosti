@@ -1,0 +1,23 @@
+{
+  "title": "Connector MISP Feed Rosti",
+  "slug": "connector-rosti",
+  "description": "OpenCTI MISP Feed Connector with specific fixes for feeds like Rosti that regenerate their manifest daily with incorrect timestamps.",
+  "short_description": "The OpenCTI MISP Feed Rosti connector imports MISP feed data into OpenCTI with real date filtering using Event.date from actual JSON files instead of unreliable manifest metadata. It supports UUID-based deduplication, robust per-event error handling, and safe field access. The connector creates reports, indicators, and observables from MISP events, handles TLP markings, MITRE ATT&CK patterns, and supports both URL and S3 source types.",
+  "logo": "external-import/connector-rosti/__metadata__/logo.png",
+  "use_cases": [
+    "Threat Intelligence",
+    "MISP Feed Import",
+    "IOC Collection"
+  ],
+  "verified": false,
+  "last_verified_date": null,
+  "playbook_supported": false,
+  "max_confidence_level": 50,
+  "support_version": ">=6.8.12",
+  "subscription_link": null,
+  "source_code": "https://github.com/V1D1AN/connector-rosti",
+  "manager_supported": false,
+  "container_version": "rolling",
+  "container_image": "v1d1an/connector-rosti",
+  "container_type": "EXTERNAL_IMPORT"
+}

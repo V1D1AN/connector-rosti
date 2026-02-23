@@ -1,17 +1,23 @@
 FROM python:3.11-alpine
 
-# Copy the connector
-COPY src /opt/opencti-connector-misp-feed
+# Set working directory
+WORKDIR /opt/opencti-connector-misp-feed
 
-# Install Python modules
-RUN apk update && apk upgrade && \
-    apk --no-cache add git build-base libmagic libffi-dev && \
-    cd /opt/opencti-connector-misp-feed && \
-    pip install --no-cache-dir -r requirements.txt && \
-    apk del git build-base && \
-    rm -rf /var/cache/apk/*
+# Copy requirements first for better caching
+COPY requirements.txt .
 
-# Expose and entrypoint
-COPY entrypoint.sh /
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+# Install dependencies
+RUN apk add --no-cache \
+    git \
+    build-base \
+    libffi-dev \
+    libmagic \
+    && pip install --no-cache-dir -r requirements.txt \
+    && apk del git build-base \
+    && rm -rf /var/cache/apk/*
+
+# Copy source code
+COPY src/ ./
+
+# Set entrypoint
+ENTRYPOINT ["python", "main.py"]
