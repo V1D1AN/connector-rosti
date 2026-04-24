@@ -2070,6 +2070,19 @@ class MispFeed:
                     processed_uuids = set(
                         current_state.get("processed_uuids", [])
                     )
+                    # Heal a poisoned cursor: if a previous run recorded a future
+                    # date as last_event_date (e.g. because Rosti published an
+                    # article with a date in the future), cap it to today so we
+                    # don't filter out every new event until real time catches up.
+                    today_str = now.strftime("%Y-%m-%d")
+                    if last_event_date > today_str:
+                        self.helper.log_warning(
+                            "Stored last_event_date ("
+                            + last_event_date
+                            + ") is in the future; capping to "
+                            + today_str
+                        )
+                        last_event_date = today_str
                     self.helper.log_info(
                         "Connector last run: "
                         + last_run.astimezone(pytz.UTC).isoformat()
@@ -2187,9 +2200,27 @@ class MispFeed:
                             self._send_bundle(work_id, bundle)
                             number_events = number_events + 1
                             processed_uuids.add(item_uuid)
-                            # Track max date seen (don't update last_event_date yet)
-                            if event_date > max_event_date:
-                                max_event_date = event_date
+                            # Track max date seen (don't update last_event_date yet).
+                            # Cap to today to prevent a future-dated event (e.g. a
+                            # Rosti article mistakenly published with a date in the
+                            # future) from poisoning the cursor and filtering out
+                            # all subsequent legitimate events until real time
+                            # catches up to that future date.
+                            today_str = now.strftime("%Y-%m-%d")
+                            effective_date = (
+                                today_str if event_date > today_str else event_date
+                            )
+                            if event_date > today_str:
+                                self.helper.log_warning(
+                                    "Event "
+                                    + item_uuid
+                                    + " has a future date ("
+                                    + event_date
+                                    + "); capping cursor at "
+                                    + today_str
+                                )
+                            if effective_date > max_event_date:
+                                max_event_date = effective_date
                         except Exception as e:
                             self.helper.log_error(
                                 "Error processing event "
